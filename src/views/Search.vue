@@ -3,28 +3,10 @@
   margin: 0.5rem 0 0.5rem auto;
   width: 60px;
   height: 60px;
-  border: 2px solid  $color-primary-1;
+  border: 2px solid $color-primary-1;
   border-radius: 1000px;
   background-color: white;
   padding: 0.5rem 0;
-}
-
-.search {
-  max-width: 600px;
-  margin: 4rem auto 2rem auto;
-  background-color: white;
-
-  &-options {
-    padding: 1rem 0.5rem;
-  }
-
-  .title {
-    background-color: $color-primary-0;
-    color: white;
-    display: flex;
-    flex-direction: row;
-    padding-right: 0.5rem;
-  }
 }
 
 #search-nav-panel {
@@ -79,70 +61,107 @@
   flex-wrap: wrap;
 }
 
-.search-result {
-  position: relative;
-  width: 20%;
+.search {
+  max-width: 600px;
+  margin: 4rem auto 2rem auto;
   background-color: white;
-  margin: 1rem;
-  overflow-wrap: break-word;
-  flex-grow: 1;
 
-  &-title {
-    display: flex;
-    flex-direction: row;
-    height: 30px;
-    margin: 1rem 0.5rem;
-    padding: 4px;
-    font-weight: bold;
-    word-wrap: anywhere;
-    span::first-letter {
-      text-transform: uppercase;
-    }
-
-    &-createdtag {
-      font-weight: normal;
-    }
-  }
-
-  &-attributes {
+  .title {
+    background-color: $color-primary-0;
     color: white;
-    background-color: $color-secondary-1-2;
-    font-size: 1.2rem;
-    padding: 6px;
     display: flex;
     flex-direction: row;
-
-    span:last-child {
-      margin-left: auto;
-    }
+    padding-right: 0.5rem;
+  }
+  
+  &-options {
+    padding: 1rem 0.5rem;
   }
 
-  &-content {
-    padding: 2rem 1rem 4rem 1rem;
+  &-result {
+    position: relative;
+    width: 20%;
+    background-color: white;
+    margin: 1rem;
+    overflow-wrap: break-word;
+    flex-grow: 1;
 
-    .far,
-    .fas {
-      margin-right: 1rem;
-    }
-
-    &-description {
-      margin-top: 1rem;
-    }
-
-    &-link {
+    &-title {
       display: flex;
       flex-direction: row;
-      justify-content: right;
-      position: absolute;
-      bottom: 1rem;
-      right: 1rem;
+      height: 30px;
+      margin: 1rem 0.5rem;
+      padding: 4px;
+      font-weight: bold;
+      word-wrap: anywhere;
+      span::first-letter {
+        text-transform: uppercase;
+      }
 
-      a {
-        color: $color-secondary-2-2;
+      &-createdtag {
+        font-weight: normal;
+      }
+    }
 
-        &:hover {
-          color: $color-secondary-2-0;
+    &-attributes {
+      color: white;
+      background-color: $color-secondary-1-2;
+      font-size: 1.2rem;
+      padding: 6px;
+      display: flex;
+      flex-direction: row;
+
+      span:last-child {
+        margin-left: auto;
+      }
+    }
+
+    &-content {
+      padding: 2rem 1rem 4rem 1rem;
+
+      .far,
+      .fas {
+        margin-right: 1rem;
+      }
+
+      &-description {
+        margin-top: 1rem;
+      }
+
+      &-link {
+        display: flex;
+        flex-direction: row;
+        justify-content: right;
+        position: absolute;
+        bottom: 1rem;
+        right: 1rem;
+
+        a {
+          color: $color-secondary-2-2;
+
+          &:hover {
+            color: $color-secondary-2-0;
+          }
         }
+      }
+    }
+    &-empty {
+      width: 16rem;
+      height: 16rem;
+      padding: 0.5rem;
+      background-color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+
+      .far {
+        font-size: 5rem;
+      }
+
+      div {
+        width: 50%;
+        margin: 1rem auto;
       }
     }
   }
@@ -235,6 +254,13 @@
       ></i>
     </div>
     <div id="search-results">
+      <div class="w3-card search-result-empty" v-if="noResults">
+        <div>
+          <i class="far fa-sad-cry"></i>
+        </div>
+        <span>No results were found</span>
+      </div>
+
       <div class="w3-card search-result" v-bind:key="result.id" v-for="result in searchResults">
         <div class="search-result-attributes">
           <span>
@@ -297,7 +323,8 @@ export default {
       totalPages: 0,
       page: 1,
       prevPage: false,
-      nextPage: false
+      nextPage: false,
+      noResults: false
     };
   },
   mounted() {
@@ -318,6 +345,7 @@ export default {
   methods: {
     setSearchResults: function(result) {
       this.totalCount = result.data.total_count;
+      this.noResults = this.totalCount < 1;
 
       if (result.newRequest) {
         const maxPagesRegex = new RegExp(/(\d*)>; rel="last"/gm);
